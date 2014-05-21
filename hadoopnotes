@@ -1,0 +1,44 @@
+hadoop fs -ls
+hadoop fs -put purchase.txt
+hadoop fs -mv purchase.txt <newname>
+
+hadoop fs -mkdir <dirname>
+hadoop fs -put purchase.txt <dirname>
+
+to run mapper and resucer using hadoop
+y
+
+hadoop jar /usr/lib/hadoop-0.20-mapreduce/contrib/streaming/hadoop-streaming-2.0-mr1-cdh4.1.1.jar -mapper mapper.py -reducer reducer.py -file mapper.py -file reducer.py -input myinput -output joboutput
+
+hs mapper.py reducer.py myinput joboutput
+//joboutput must not already exist
+
+---------------------
+to run your mapper and reducer on sample file
+
+head -50 ../data/purchase.txt > testfile
+cat testfile | ../mapper.py | sort | ../reducer.py
+-------------------------
+
+
+mapper
+
+def mapper():
+for line in sys.stdin:
+	data  = line.strip().split("\t")
+	date,time,store,item,cost,payment = data
+	print "{0}\t{1}".format(store,cost)
+
+reducer :
+
+def reducer():
+	salestotal = 0
+	oldkey = None
+	for line in sys.stdin:
+		data = line.strip().split()
+		thiskey,thissale = data
+		if oldkey and oldkey!= thiskey:
+			print "{0}\t{1}".format(oldkey,salesTotal)
+			salestotal = 0
+		oldkey = thiskey
+		salestotal+=flaot(thissale)
